@@ -11,12 +11,6 @@ import java.util.Random;
 public class GameApprovalTest {
 
     @Test
-    void game_with_several_players_approval_test() {
-        Game aGame = simulateGame();
-        Approvals.verify(aGame);
-    }
-
-    @Test
     void game_with_several_players_sysout_test() {
         ByteArrayOutputStream fakeoutput = new ByteArrayOutputStream();
         System.setOut(new PrintStream(fakeoutput));
@@ -24,6 +18,19 @@ public class GameApprovalTest {
         simulateGame();
 
         Approvals.verify(fakeoutput.toString());
+    }
+
+    @Test
+    void not_getting_out_of_jail() {
+        Game aGame = new Game();
+        aGame.add("Kevin");
+        aGame.roll(2);
+
+        aGame.wrongAnswer();
+        aGame.roll(1);
+        aGame.correctAnswer();
+
+        aGame.roll(2);
     }
 
     private static Game simulateGame() {
@@ -44,7 +51,7 @@ public class GameApprovalTest {
             if (rand.nextInt(9) == 7) {
                 notAWinner = aGame.wrongAnswer();
             } else {
-                notAWinner = aGame.wasCorrectlyAnswered();
+                notAWinner = aGame.correctAnswer();
             }
 
 

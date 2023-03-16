@@ -1,24 +1,18 @@
 package com.adaptionsoft.games.uglytrivia;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Game {
-    private final int max = 6;
-    private List<String> players = new ArrayList<>();
-    private int[] places = new int[max];
-    private int[] purses = new int[max];
-    private boolean[] inPenaltyBox = new boolean[max];
+    private List<Player> players = new ArrayList<>();
 
     private LinkedList<String> q1 = new LinkedList<>();
     private LinkedList<String> q2 = new LinkedList<>();
     private LinkedList<String> q3 = new LinkedList<>();
     private LinkedList<String> q4 = new LinkedList<>();
 
-    private int currentPlayer = 0;
-    private boolean isGettingOutOfPenaltyBox;
+    private int currentPlayerIndex = 0;
 
     public Game() {
         for (int i = 0; i < 50; i++) {
@@ -30,10 +24,7 @@ public class Game {
     }
 
     public boolean add(String playerName) {
-        players.add(playerName);
-        places[howManyPlayers()] = 0;
-        purses[howManyPlayers()] = 0;
-        inPenaltyBox[howManyPlayers()] = false;
+        players.add(new Player(playerName));
 
         log(playerName + " was added");
         log("They are player number " + players.size());
@@ -45,36 +36,34 @@ public class Game {
     }
 
     public void roll(int roll) {
-        log(players.get(currentPlayer) + " is the current player");
+        Player currentPlayer = players.get(currentPlayerIndex);
+        log(currentPlayer + " is the current player");
         log("They have rolled a " + roll);
 
-        if (inPenaltyBox[currentPlayer]) {
+        if (currentPlayer.isInPenaltyBox()) {
             if (roll % 2 != 0) {
                 //User is getting out of penalty box
-                isGettingOutOfPenaltyBox = true;
+                currentPlayer.free();
 
                 //Write that user is getting out
-                log(players.get(currentPlayer) + " is getting out of the penalty box");
+                log(currentPlayer + " is getting out of the penalty box");
                 // add roll to place
-                places[currentPlayer] = places[currentPlayer] + roll;
-                if (places[currentPlayer] > 11) places[currentPlayer] = places[currentPlayer] - 12;
+                currentPlayer.move(roll);
 
-                log(players.get(currentPlayer)
+                log(currentPlayer
                         + "'s new location is "
-                        + places[currentPlayer]);
+                        + currentPlayer.getPosition());
                 log("The category is " + currentCategory());
                 askQuestion();
             } else {
-                log(players.get(currentPlayer) + " is not getting out of the penalty box");
-                isGettingOutOfPenaltyBox = false;
+                log(currentPlayer + " is not getting out of the penalty box");
             }
         } else {
-            places[currentPlayer] = places[currentPlayer] + roll;
-            if (places[currentPlayer] > 11) places[currentPlayer] = places[currentPlayer] - 12;
+            currentPlayer.move(roll);
 
-            log(players.get(currentPlayer)
+            log(currentPlayer
                     + "'s new location is "
-                    + places[currentPlayer]);
+                    + currentPlayer.getPosition());
             log("The category is " + currentCategory());
             askQuestion();
         }
@@ -92,7 +81,7 @@ public class Game {
     }
 
     private String currentCategory() {
-        return switch (places[currentPlayer] % 4) {
+        return switch (players.get(currentPlayerIndex).getPosition() % 4) {
             case 0 -> "Pop";
             case 1 -> "Science";
             case 2 -> "Sports";
@@ -106,33 +95,37 @@ public class Game {
      *
      * @return
      */
-    public boolean wasCorrectlyAnswered() {
-        if (inPenaltyBox[currentPlayer]) {
-            if (isGettingOutOfPenaltyBox) {
-                return getWinner();
-            } else {
-                currentPlayer++;
-                if (currentPlayer == players.size()) currentPlayer = 0;
-                return true;
-            }
+    public boolean correctAnswer() {
+        if (players.get(currentPlayerIndex).isInPenaltyBox()) {
+            nextPlayer();
+            return true;
         } else {
-            return getWinner();
+            return scorePointsChangePlayerAndVerifyIfLoser();
         }
     }
 
-    private boolean getWinner() {
+    private void nextPlayer() {
+        currentPlayerIndex++;
+        if (currentPlayerIndex == players.size()) currentPlayerIndex = 0;
+    }
+
+    private boolean scorePointsChangePlayerAndVerifyIfLoser() {
+        scorePoints();
+        Player currentPlayer = players.get(this.currentPlayerIndex);
+        boolean notAWinner = !currentPlayer.isWinner();
+        nextPlayer();
+
+        return notAWinner;
+    }
+
+    private void scorePoints() {
+        Player currentPlayer = players.get(this.currentPlayerIndex);
         log("Answer was correct!!!!");
-        purses[currentPlayer]++;
-        log(players.get(currentPlayer)
+        currentPlayer.score();
+        log(currentPlayer
                 + " now has "
-                + purses[currentPlayer]
+                + currentPlayer.getPoints()
                 + " Gold Coins.");
-
-        boolean winner = !(purses[currentPlayer] == 6);
-        currentPlayer++;
-        if (currentPlayer == players.size()) currentPlayer = 0;
-
-        return winner;
     }
 
     /**
@@ -141,12 +134,12 @@ public class Game {
      * @return
      */
     public boolean wrongAnswer() {
+        Player currentPlayer = players.get(currentPlayerIndex);
         log("Question was incorrectly answered");
-        log(players.get(currentPlayer) + " was sent to the penalty box");
-        inPenaltyBox[currentPlayer] = true;
+        log(currentPlayer + " was sent to the penalty box");
+        currentPlayer.sendToJail();
 
-        currentPlayer++;
-        if (currentPlayer == players.size()) currentPlayer = 0;
+        nextPlayer();
         return true;
     }
 
@@ -156,15 +149,10 @@ public class Game {
     @Override
     public String toString() {
         return "Game{" +
-                "MAX_FIVE=" + max +
                 ", players=" + players +
-                ", places=" + Arrays.toString(places) +
-                ", purses=" + Arrays.toString(purses) +
-                ", inPenaltyBox=" + Arrays.toString(inPenaltyBox) +
                 ", _q1=" + q1 +
                 ", q2=" + q2 +
-                ", currentPlayer=" + currentPlayer +
-                ", isGettingOutOfPenaltyBox=" + isGettingOutOfPenaltyBox +
+                ", currentPlayer=" + currentPlayerIndex +
                 ", q3=" + q3 +
                 ", Q5=" + q4 +
                 '}';
