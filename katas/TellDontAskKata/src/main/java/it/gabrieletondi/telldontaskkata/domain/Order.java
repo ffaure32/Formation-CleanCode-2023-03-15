@@ -31,6 +31,11 @@ public class Order {
         return items;
     }
 
+    public void addItem(OrderItem orderItem) {
+        this.items.add(orderItem);
+        this.tax = this.tax.add(orderItem.getTax());
+        this.total = this.total.add(orderItem.getTaxedAmount());
+    }
     public void setItems(List<OrderItem> items) {
         this.items = items;
     }
