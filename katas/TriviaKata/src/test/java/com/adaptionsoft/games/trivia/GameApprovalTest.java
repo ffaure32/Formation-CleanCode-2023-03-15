@@ -24,7 +24,7 @@ public class GameApprovalTest {
     void not_getting_out_of_jail() {
         Game aGame = new Game();
         aGame.add("Kevin");
-        aGame.roll(2);
+        aGame.roll(15);
 
         aGame.wrongAnswer();
         aGame.roll(1);
