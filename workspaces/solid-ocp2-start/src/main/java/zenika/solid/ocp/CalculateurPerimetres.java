@@ -12,6 +12,9 @@ public class CalculateurPerimetres {
             } else if(figure instanceof Triangle) {
                 var triangle = (Triangle)figure;
                 perimetre += (triangle.base + triangle.cote2 + triangle.cote3);
+            } else if(figure instanceof Cercle) {
+                var cercle = (Cercle)figure;
+                perimetre += 2 * Math.PI * cercle.rayon;
             }
         }
         return perimetre;

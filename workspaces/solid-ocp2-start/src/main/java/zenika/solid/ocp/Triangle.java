@@ -12,4 +12,8 @@ public class Triangle implements Figure {
         this.cote2 = cote2;
         this.cote3 = cote3;
     }
+
+    public double getAire() {
+        return (double) (base * hauteur) / 2;
+    }
 }

@@ -10,10 +10,10 @@ public class FlightTest {
     
     @Test public void should_retrieve_departure_airport_from_flight() {
         Flight f = Flight.from(Paris).to(Tokyo);
-        f.setSuffix("CDG");
+        f.setDepartureAirport("CDG");
         
         assertEquals("Paris-Tokyo-CDG", f.getCode());
-        assertEquals("CDG", f.getSuffix()); 
+        assertEquals("CDG", f.getDepartureAirport());
     }
     
 }

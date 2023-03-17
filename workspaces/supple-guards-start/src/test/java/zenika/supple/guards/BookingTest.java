@@ -18,7 +18,7 @@ public class BookingTest {
 
     @Before public void setup() {
         Set<Room> oneBigRoom = new HashSet<Room>() {{
-            add(new Room(20));
+            add(new Room(-12));
         }};
 
         when(rooms.findAllRooms()).thenReturn(oneBigRoom);
@@ -28,4 +28,10 @@ public class BookingTest {
         Optional<Room> optionalRoom = booking.book(10);
         assertTrue(optionalRoom.isPresent());
     }
+
+    @Test public void should_book_with_negative_capacity_should_generate_an_error() {
+        Optional<Room> optionalRoom = booking.book(-14);
+        assertTrue(optionalRoom.isPresent());
+    }
+
 }

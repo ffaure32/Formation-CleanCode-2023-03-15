@@ -33,4 +33,10 @@ public class BookingTest {
     public void should_throw_when_capacity_is_invalid() {
         booking.book(-1);
     }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void should_throw_when_capacity_is_invalid() {
+        booking.book(-1);
+    }
 }

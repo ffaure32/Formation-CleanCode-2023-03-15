@@ -8,4 +8,8 @@ public class Rectangle implements Figure {
         this.longueur = longueur;
         this.largeur = largeur;
     }
+
+    public double getAire() {
+        return largeur * longueur;
+    }
 }

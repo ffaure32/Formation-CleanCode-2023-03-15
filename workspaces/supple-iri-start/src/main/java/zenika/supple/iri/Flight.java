@@ -7,6 +7,7 @@ public class Flight {
     private final String CODE_TEMPLATE = "fromCity-toCity-departureAirport";
     
     private final City from, to;
+    private String departureAirportCode;
     private String code;
 
     private Flight(City from, City to) {
@@ -17,12 +18,12 @@ public class Flight {
                 .replace("toCity", to.name());
     }
 
-    public String getSuffix() {
-        return code.substring(code.lastIndexOf('-') + 1);
+    public String getDepartureAirport() {
+        return departureAirportCode;
     }
     
     public String getCode() {
-        return code;
+        return this.code;
     }
     
     
@@ -43,7 +44,8 @@ public class Flight {
         }
     }
     
-    public void setSuffix(String suffix) {
-        code = code.replace("departureAirport", suffix);
+    public void setDepartureAirport(String code) {
+        this.departureAirportCode = code;
+        this.code = this.code.replace("departureAirport", departureAirportCode);
     }
 }
